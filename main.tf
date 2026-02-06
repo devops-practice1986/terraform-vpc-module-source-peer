@@ -32,9 +32,9 @@ resource "aws_subnet" "public" {
 
   tags = merge(
     var.common_tags,
-    var.public_subnet_tags[count.index],
+    var.public_subnet_tags,
     {
-      Name = "${local.resource_name}-public-subnet-${count.index + 1}"
+      Name = "${local.resource_name}-public-${count.index}"
     }
   )
 }
@@ -47,9 +47,9 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     var.common_tags,
-    var.private_subnet_tags[count.index],
+    var.private_subnet_tags,
     {
-      Name = "${local.resource_name}-private-subnet-${count.index + 1}"
+      Name = "${local.resource_name}-private-${count.index}"
     }
   )
 }
@@ -63,23 +63,23 @@ resource "aws_subnet" "database_private" {
 
   tags = merge(
     var.common_tags,
-    var.database_private_subnet_tags[count.index],
+    var.database_private_subnet_tags,
     {
-      Name = "${local.resource_name}-database-private-subnet-${count.index + 1}"
+      Name = "${local.resource_name}-database-${count.index}"
     }
   )
 }
 
 # DB subnet group for RDS instances to be launched in private subnets
 resource "aws_db_subnet_group" "main" {
-  name       = "${local.resource_name}-db-subnet-group"
+  name       = local.resource_name
   subnet_ids = aws_subnet.database_private[*].id
 
   tags = merge(
     var.common_tags,
     var.database_subnet_tags,
     {
-      Name = "${local.resource_name}-db-subnet-group"
+      Name = local.resource_name
     }
   )
 }
@@ -98,7 +98,7 @@ resource "aws_nat_gateway" "main" {
     var.common_tags,
     var.nat_gateway_tags,
     {
-      Name = "${local.resource_name}-nat-gateway"
+      Name = "local.resource_name"
     }
   )
   # To ensure proper ordering, it is recommended to add an explicit dependency
@@ -114,7 +114,7 @@ resource "aws_route_table" "public" {
     var.common_tags,
     var.public_route_table_tags,
     {
-      Name = "${local.resource_name}-public-rt"
+      Name = local.resource_name
     }
   )
 }
@@ -125,7 +125,7 @@ resource "aws_route_table" "private" {
   tags = merge(
     var.common_tags,
     {
-      Name = "${local.resource_name}-private-rt"
+      Name = local.resource_name
     }
   )
 }
@@ -136,7 +136,7 @@ resource "aws_route_table" "database_private" {
   tags = merge(
     var.common_tags,
     {
-      Name = "${local.resource_name}-database-private-rt"
+      Name = local.resource_name
     }
   )
 }
